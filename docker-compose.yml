@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: emailscheduler
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      PORT: 3000
+      DATABASE_URL: "postgresql://postgres:admin@postgres:5432/emailscheduler"
+      SMTP_USER: yourgmail@gmail.com
+      SMTP_PASS: your_app_password
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: sh -c "npx prisma db push && node src/index.js"
+
+volumes:
+  pgdata:
