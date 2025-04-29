@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EmailTask {
+  id        String   @id @default(uuid())
+  to        String
+  subject   String
+  body      String
+  sendAt    DateTime
+  status    Status   @default(SCHEDULED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Status {
+  SCHEDULED
+  SENT
+  FAILED
+}
